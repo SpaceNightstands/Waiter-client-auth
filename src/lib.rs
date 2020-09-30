@@ -14,15 +14,17 @@ const JWT_SECRET: &str = dotenv_codegen::dotenv!("JWT_SECRET");
 const JWT_SECRET: &str = "Test";
 
 lazy_static::lazy_static! {
-	static ref JWT_KEY: Hmac<SHA> = {
+	static ref JWT_KEY: Result<Hmac<SHA>, String> = {
 		use hmac::NewMac;
 		Hmac::<SHA>::new_varkey(JWT_SECRET.as_bytes())
-			.unwrap()
+			.map_err(
+				|err| format!("{:?}", err)
+			)
 	};
 }
 
 #[wasm_bindgen]
-pub fn build_jwt(val: &Object) -> String {
+pub fn build_jwt(val: &Object) -> Result<String, JsValue> {
 	use std::collections::HashMap;
 	use jwt::token::signed::SignWithKey;
 
@@ -33,12 +35,17 @@ pub fn build_jwt(val: &Object) -> String {
 				use wasm_bindgen::JsCast;
 				let kvpair = kvpair.dyn_ref::<js_sys::Array>()?;
 				if kvpair.length() == 2 {
-					Some(kvpair.into_serde::<(String, Value)>().unwrap())
+					kvpair.into_serde::<(String, Value)>().ok()
 				} else {
 					None
 				}
 			}
 		).collect();
-	map.sign_with_key(&*JWT_KEY).unwrap()
+	map.sign_with_key(JWT_KEY.as_ref()?)
+		.map_err(
+			|err| JsValue::from_str(
+				&*format!("{}", err)
+			)
+		)
 }
 
