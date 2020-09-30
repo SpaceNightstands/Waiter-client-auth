@@ -18,6 +18,7 @@ fn object_1() {
 	assert_eq!(build_jwt(&test), "eyJhbGciOiJIUzI1NiJ9.eyJ0ZXN0IjoiQUJDIn0.i1J1hhBpHZT70_gZZipdE_cWsZJxAoK3p03I7FjcfsA");
 }
 
+#[wasm_bindgen_test]
 fn object_2() {
 	console_error_panic_hook::set_once();
 	use wasm_bindgen::{JsCast, JsValue};

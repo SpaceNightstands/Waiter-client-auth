@@ -29,24 +29,6 @@ pub fn build_jwt(val: &Object) -> String {
 				use wasm_bindgen::JsCast;
 				let kvpair = kvpair.dyn_ref::<js_sys::Array>()?;
 				if kvpair.length() == 2 {
-					/*let value = kvpair.get(1);
-					Some((
-						kvpair.get(0).as_string()?,
-						value.as_string()
-							.or_else(
-								|| value.as_f64().map(
-										|n| n.to_string()
-									 )
-							).or_else(
-								|| value.as_bool().map(
-										|n| n.to_string()
-									 )
-							).or_else(
-								|| value.dyn_ref::<Object>().map(
-										|obj| format!("{:?}", obj.to_string())
-									 )
-							)?
-					))*/
 					Some(kvpair.into_serde::<(String, Value)>().unwrap())
 				} else {
 					None
