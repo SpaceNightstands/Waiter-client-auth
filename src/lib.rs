@@ -1,17 +1,22 @@
 use wasm_bindgen::prelude::*;
 use js_sys::Object;
+use hmac::Hmac;
+use sha2::Sha256 as SHA;
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
+#[cfg(not(debug_assertions))]
 //Should scramble with const fn
 const JWT_SECRET: &str = dotenv_codegen::dotenv!("JWT_SECRET");
+#[cfg(debug_assertions)]
+const JWT_SECRET: &str = "Test";
 
 lazy_static::lazy_static! {
-	static ref JWT_KEY: hmac::Hmac<sha2::Sha256> = {
+	static ref JWT_KEY: Hmac<SHA> = {
 		use hmac::NewMac;
-		hmac::Hmac::<sha2::Sha256>::new_varkey(JWT_SECRET.as_bytes())
+		Hmac::<SHA>::new_varkey(JWT_SECRET.as_bytes())
 			.unwrap()
 	};
 }
