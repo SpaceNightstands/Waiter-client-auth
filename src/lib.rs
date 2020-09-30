@@ -5,22 +5,21 @@ use js_sys::Object;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[wasm_bindgen]
-extern {
-	fn alert(s: &str);
-}
-
 //Should scramble with const fn
 const JWT_SECRET: &str = dotenv_codegen::dotenv!("JWT_SECRET");
 
+lazy_static::lazy_static! {
+	static ref JWT_KEY: hmac::Hmac<sha2::Sha256> = {
+		use hmac::NewMac;
+		hmac::Hmac::<sha2::Sha256>::new_varkey(JWT_SECRET.as_bytes())
+			.unwrap()
+	};
+}
+
 #[wasm_bindgen]
 pub fn build_jwt(val: &Object) -> String {
-	use hmac::NewMac;
 	use std::collections::HashMap;
 	use jwt::token::signed::SignWithKey;
-
-	let key = hmac::Hmac::<sha2::Sha256>::new_varkey(JWT_SECRET.as_bytes())
-    .unwrap();
 
 	use serde_json::Value;
 	let map: HashMap<String, Value> = Object::entries(val).iter()
@@ -35,6 +34,6 @@ pub fn build_jwt(val: &Object) -> String {
 				}
 			}
 		).collect();
-	map.sign_with_key(&key).unwrap()
+	map.sign_with_key(&*JWT_KEY).unwrap()
 }
 
