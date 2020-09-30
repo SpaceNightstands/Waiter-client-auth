@@ -18,7 +18,11 @@ lazy_static::lazy_static! {
 		use hmac::NewMac;
 		Hmac::<SHA>::new_varkey(JWT_SECRET.as_bytes())
 			.map_err(
-				|err| format!("{:?}", err)
+				|err| {
+					let error = format!("{:?}", err);
+					wasm_bindgen::intern(&*error);
+					error
+				}
 			)
 	};
 }
@@ -41,11 +45,15 @@ pub fn build_jwt(val: &Object) -> Result<String, JsValue> {
 				}
 			}
 		).collect();
-	map.sign_with_key(JWT_KEY.as_ref()?)
-		.map_err(
-			|err| JsValue::from_str(
-				&*format!("{}", err)
-			)
+	map.sign_with_key(
+		JWT_KEY.as_ref()
+			.map_err(
+				|err| wasm_bindgen::throw_str(err)
+			).unwrap()
+	).map_err(
+		|err| JsValue::from_str(
+			&*format!("{}", err)
 		)
+	)
 }
 
