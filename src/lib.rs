@@ -28,14 +28,14 @@ pub fn build_jwt(val: &Object) -> Result<String, JsValue> {
 	use std::collections::HashMap;
 	use jwt::token::signed::SignWithKey;
 
-	use serde_json::Value;
-	let map: HashMap<String, Value> = Object::entries(val).iter()
+	use serde_json::Value as JsonValue;
+	let map: HashMap<String, JsonValue> = Object::entries(val).iter()
     .filter_map(
 			|kvpair| {
 				use wasm_bindgen::JsCast;
 				let kvpair = kvpair.dyn_ref::<js_sys::Array>()?;
 				if kvpair.length() == 2 {
-					kvpair.into_serde::<(String, Value)>().ok()
+					kvpair.into_serde::<(String, JsonValue)>().ok()
 				} else {
 					None
 				}
