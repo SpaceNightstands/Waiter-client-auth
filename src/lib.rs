@@ -31,8 +31,12 @@ lazy_static::lazy_static! {
 pub fn build_jwt(val: &Object) -> Result<String, JsValue> {
 	use std::collections::HashMap;
 	use jwt::token::signed::SignWithKey;
-
 	use serde_json::Value as JsonValue;
+
+	let key = JWT_KEY.as_ref()
+		.map_err(
+			|err| wasm_bindgen::throw_str(err)
+		).unwrap();
 	let map: HashMap<String, JsonValue> = Object::entries(val).iter()
     .filter_map(
 			|kvpair| {
@@ -45,15 +49,11 @@ pub fn build_jwt(val: &Object) -> Result<String, JsValue> {
 				}
 			}
 		).collect();
-	map.sign_with_key(
-		JWT_KEY.as_ref()
-			.map_err(
-				|err| wasm_bindgen::throw_str(err)
-			).unwrap()
-	).map_err(
-		|err| JsValue::from_str(
-			&*format!("{}", err)
+	map.sign_with_key(key)
+		.map_err(
+			|err| JsValue::from_str(
+				&*format!("{}", err)
+			)
 		)
-	)
 }
 
