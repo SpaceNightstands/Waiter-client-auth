@@ -1,0 +1,22 @@
+[package]
+name = "waiter-client-auth-macros"
+version = "0.1.0"
+authors = ["Systool <systool@magisystem.xyz>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "~1.0.7"
+proc-macro2 = "~1.0.24"
+dotenv = "^0.15.0"
+rand = "0.7"
+
+[dependencies.syn]
+version = "~1.0.48"
+default-features = false
+features = [
+				 "parsing",
+				 "proc-macro"
+]
