@@ -8,6 +8,7 @@ pub fn scramble(input: TS) -> TS {
 	scramble_impl(input.into()).into()
 }
 
+//TODO: Improve error handling
 fn scramble_impl(input: TokenStream) -> TokenStream {
 	let name = syn::parse2::<syn::LitStr>(input)
     .unwrap();
