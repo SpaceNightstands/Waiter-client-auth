@@ -10,9 +10,8 @@ pub fn scramble(input: TS) -> TS {
 
 fn scramble_impl(input: TokenStream) -> TokenStream {
 	let name = syn::parse2::<syn::LitStr>(input)
-    .unwrap()
-    .value();
-	let secret = dotenv::var(name).unwrap();
+    .unwrap();
+	let secret = dotenv::var(name.value()).unwrap();
 	let secret = secret.as_bytes();
 	let mask = rand::thread_rng().sample_iter(rand::distributions::Standard)
     .take(secret.len())
@@ -24,9 +23,9 @@ fn scramble_impl(input: TokenStream) -> TokenStream {
 		).collect::<Vec<u8>>();
 
 	let length = secret.len();
-	//let ident = syn::Ident::new(name);
+	let ident = syn::Ident::new(&*name.value(), name.span());
 	quote!(
-		const JWT_SECRET: [(u8, u8); #length] = [#((#mask, #complementary)),*];
+		const #ident: [(u8, u8); #length] = [#((#mask, #complementary)),*];
 	).into()
 }
 
