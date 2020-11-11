@@ -11,8 +11,8 @@ crate-type = ["cdylib", "rlib"]
 wasm-bindgen = { version = "0.2.63", features=["serde-serialize"] }
 serde_json = "*"
 dotenv_codegen = "^0.15.0"
-jwt = "^0.10.0"
-hmac = "*"
+jwt = "^0.11.0"
+hmac = "^0.9.0"
 sha2 = "*"
 js-sys = "^0.3.45"
 lazy_static = "~1.4.0"
