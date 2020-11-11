@@ -25,6 +25,9 @@ waiter-client-auth-macros = { path = "waiter-client-auth-macros" }
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
 wee_alloc = "0.4.5"
 
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Oz", "--enable-mutable-globals"]
+
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
 console_error_panic_hook = "0.1.6"
