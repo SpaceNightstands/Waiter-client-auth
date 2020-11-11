@@ -1,2 +1,2 @@
-# Waiter_Client-Auth
+# Waiter-Client-Auth
 
