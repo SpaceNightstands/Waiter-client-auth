@@ -1,10 +1,10 @@
-use wasm_bindgen::prelude::*;
-use js_sys::Object;
 use hmac::Hmac;
-use sha2::Sha256 as SHA;
-use std::collections::HashMap;
+use js_sys::Object;
 use jwt::token::signed::SignWithKey;
 use serde_json::Value as JsonValue;
+use sha2::Sha256 as SHA;
+use std::collections::HashMap;
+use wasm_bindgen::prelude::*;
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
@@ -32,27 +32,22 @@ lazy_static::lazy_static! {
 
 #[wasm_bindgen]
 pub fn build_jwt(val: &Object) -> Result<String, JsValue> {
-	let key = JWT_KEY.as_ref()
-		.map_err(
-			|err| wasm_bindgen::throw_str(err)
-		).unwrap();
-	let map: HashMap<String, JsonValue> = Object::entries(val).iter()
-    .filter_map(
-			|kvpair| {
-				use wasm_bindgen::JsCast;
-				let kvpair = kvpair.dyn_ref::<js_sys::Array>()?;
-				if kvpair.length() == 2 {
-					kvpair.into_serde::<(String, JsonValue)>().ok()
-				} else {
-					None
-				}
+	let key = JWT_KEY
+		.as_ref()
+		.map_err(|err| wasm_bindgen::throw_str(err))
+		.unwrap();
+	let map: HashMap<String, JsonValue> = Object::entries(val)
+		.iter()
+		.filter_map(|kvpair| {
+			use wasm_bindgen::JsCast;
+			let kvpair = kvpair.dyn_ref::<js_sys::Array>()?;
+			if kvpair.length() == 2 {
+				kvpair.into_serde::<(String, JsonValue)>().ok()
+			} else {
+				None
 			}
-		).collect();
+		})
+		.collect();
 	map.sign_with_key(key)
-		.map_err(
-			|err| JsValue::from_str(
-				&*format!("{}", err)
-			)
-		)
+		.map_err(|err| JsValue::from_str(&*format!("{}", err)))
 }
-
